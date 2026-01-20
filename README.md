@@ -97,3 +97,164 @@ Frontend runs on:
 http:///13.232.138.111:3000
 Deployed Application URL
 
+
+
+
+
+
+
+
+
+
+
+
+
+Flask Backend & Express Frontend Deployment on AWS ECS
+
+This project demonstrates how to containerize and deploy a Flask backend and an Express frontend using Docker, AWS ECR, ECS (Fargate), Application Load Balancer, and VPC.
+
+ Architecture Overview
+User
+  │
+ 
+Application Load Balancer (HTTP : 80)
+  │
+  
+ECS Fargate (Express Frontend – Port 3000)
+  │
+  
+ECS Fargate (Flask Backend – Port 5000)
+
+Tech Stack
+
+Backend: Flask (Python)
+
+Frontend: Express.js (Node.js)
+
+Containerization: Docker
+
+Cloud Services:
+
+AWS ECR (Elastic Container Registry)
+
+AWS ECS (Fargate)
+
+Application Load Balancer
+
+VPC & Security Groups
+
+Repository Structure
+.
+├── Backend/
+│   ├── app.py
+│   ├── requirements.txt
+│   └── Dockerfile
+│
+├── Frontend/
+│   ├── server.js
+│   ├── package.json
+│   └── Dockerfile
+│
+└── README.md
+
+ Dockerization
+Backend Dockerfile (Flask)
+FROM python:3.11-slim
+
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+EXPOSE 5000
+CMD ["python", "app.py"]
+
+Frontend Dockerfile (Express)
+FROM node:18-alpine
+
+WORKDIR /app
+
+COPY package.json .
+RUN npm install
+
+COPY . .
+
+EXPOSE 3000
+CMD ["npm", "start"]
+
+ AWS ECR Setup
+
+Created two ECR repositories
+
+flask-backend
+
+express-frontend
+
+Built & pushed images:
+
+docker build -t flask-backend .
+docker tag ecrfront:latest 210362853400.dkr.ecr.ap-south-1.amazonaws.com/ecrfront:latest
+docker push 210362853400.dkr.ecr.ap-south-1.amazonaws.com/ecrfront:latest
+
+
+
+Same steps for backend
+
+ECS Deployment (Fargate)
+ECS Cluster
+
+Cluster Type: AWS Fargate
+
+Cluster Name: dockerdeploy1
+
+Task Definitions
+Service			Port	
+Flask Backend		5000	
+Express Frontend	3000	
+
+Target Groups
+
+Service	Target Type	Port
+Frontend	IP	3000
+Backend	IP	5000
+
+
+
+
+ Fargate requires target type = IP
+
+ECS Services
+
+Frontend Service
+
+Attached to Application Load Balancer
+
+Listener: HTTP : 80
+
+Target Group: frontend-tg-ip
+
+Backend Service
+
+Internal service
+
+Accessible only from frontend
+
+ Security Groups
+Load Balancer SG
+
+Allow HTTP (80) from 0.0.0.0/0
+
+Frontend ECS SG
+
+Allow port 3000 from ALB SG
+
+Backend ECS SG
+
+Allow port 5000 from Frontend SG
+
+Deployed Application URL
+http://ecs-alb-66959023.ap-south-1.elb.amazonaws.com/
+
+
