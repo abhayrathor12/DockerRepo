@@ -63,7 +63,7 @@ yaml
 ---
 
 ###  Install Required Packages
-```bash
+
 sudo apt update
 sudo apt install python3-pip git -y
 curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
@@ -85,7 +85,7 @@ Backend runs on:
 
 http://13.232.138.111:5000
  Frontend (Express)
-bash
+
 
 cd frontend
 npm install
